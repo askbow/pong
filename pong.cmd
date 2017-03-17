@@ -17,7 +17,6 @@ echo Success: Administrative permissions confirmed.
 rem here goes python
 python %scriptpath%pong.py
 
-goto errorNoPython
 ) else (
 echo Failure: Python found but current permissions inadequate. Running with standard ping tool. 
 goto errorNoPython
