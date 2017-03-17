@@ -24,7 +24,7 @@ goto errorNoPython
 )
 
 
-goto:eof
+goto eof
 :errorNoPython
 echo.
 echo ==========================
@@ -39,3 +39,5 @@ echo ==========================
 echo next stage - long ping 8.8.8.8
 pause
 ping -w 50 -l 32 -t 8.8.8.8
+
+:eof
