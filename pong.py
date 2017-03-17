@@ -9,9 +9,26 @@
 
 """
 from pythonping import * 
-
+import csv
+import time
+import socket
 
 if __name__ == '__main__':
+    DataFileReader = csv.DictReader(open(r'pinglist.txt'),fieldnames=("address", "description"), delimiter=';')
+    data = {}
+    counter={1,2,3}
+    for line in DataFileReader:
+        data[line['address']]=0
+        
+        for i in counter:
+            try:
+                a = do_one(line['address'], timeout=2)#print socket.gethostbyname(line['address'])
+                if a: data[line['address']] +=a
+            except:
+                pass
+        data[line['address']]=data[line['address']]/3
+        print line['address'],data[line['address']]
+    
     #     GOOGLE
     #verbose_ping("8.8.8.8")
     print do_one("8.8.8.8", timeout=2)
