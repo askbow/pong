@@ -1,18 +1,32 @@
 @echo off
 SET scriptpath=%~dp0
 
-rem TODO:
-rem simple way to check for python presense: https://stackoverflow.com/questions/4920483/batch-file-to-check-if-python-is-installed/26241114#26241114
-rem python --version 2>NUL
-rem if errorlevel 1 goto errorNoPython
-rem 
-rem rem here goes python
+rem simple way to check for python presense:
+rem  https://stackoverflow.com/questions/4920483/batch-file-to-check-if-python-is-installed/26241114#26241114
+python --version 2>NUL
+if errorlevel 1 (
+echo Python not installed. Continue with standard ping:
+goto errorNoPython
+)
+rem Detection method from
+rem   https://stackoverflow.com/questions/4051883/batch-script-how-to-check-for-admin-rights/11995662#11995662
+echo Administrative permissions required. Detecting permissions...
+net session >nul 2>&1
+if %errorLevel% == 0 (
+echo Success: Administrative permissions confirmed.
+rem here goes python
 rem python %scriptpath%pong.py
-rem 
-rem goto:eof
-rem :errorNoPython
-rem echo.
-rem echo Python not installed. Continue with standard ping:
+rem not ready yet
+goto errorNoPython
+) else (
+echo Failure: Python found but current permissions inadequate. Running with standard ping tool. 
+goto errorNoPython
+)
+
+
+goto:eof
+:errorNoPython
+echo.
 echo ==========================
 echo World-wide PING starting
 echo ==========================
