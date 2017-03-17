@@ -26,9 +26,13 @@ if __name__ == '__main__':
                 if a: data[line['address']] +=a
             except:
                 pass
-        data[line['address']]=data[line['address']]/3
-        print line['address'],data[line['address']]
+        data[line['address']]=1000*(data[line['address']]/3)
+        print line['address'],"%0.4fms" % data[line['address']]
     
     #     GOOGLE
     #verbose_ping("8.8.8.8")
-    print do_one("8.8.8.8", timeout=2)
+    while 1:
+        if do_one("8.8.8.8", timeout=2): 
+            print "!",
+            time.sleep(1)
+        else: print "."
