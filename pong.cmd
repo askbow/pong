@@ -15,8 +15,8 @@ net session >nul 2>&1
 if %errorLevel% == 0 (
 echo Success: Administrative permissions confirmed.
 rem here goes python
-rem python %scriptpath%pong.py
-rem not ready yet
+python %scriptpath%pong.py
+
 goto errorNoPython
 ) else (
 echo Failure: Python found but current permissions inadequate. Running with standard ping tool. 
