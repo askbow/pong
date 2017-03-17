@@ -31,7 +31,7 @@ echo ==========================
 echo World-wide PING starting
 echo ==========================
 
-for /F "skip=1 delims=; tokens=1,*" %%A   in (%scriptpath%pinglist.txt) do @echo ========================== & @echo . & @echo     %%B & ping -w 500 -l 100 -n 3 %%A
+for /F "delims=; tokens=1,*" %%A   in (%scriptpath%pinglist.txt) do @echo ========================== & @echo . & @echo     %%B & ping -w 500 -l 100 -n 3 %%A
 
 echo ==========================
 echo World-wide PING complete

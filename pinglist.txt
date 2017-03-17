@@ -1,4 +1,3 @@
-address;description
 8.8.8.8;GOOGLE (anycast Worldwide)
 8.8.4.4;GOOGLE (anycast Worldwide)
 2001:4860:4860::8888;GOOGLE IPv6 (anycast Worldwide)
