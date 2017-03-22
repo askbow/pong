@@ -12,9 +12,10 @@ from pythonping import *
 import csv
 import time
 import socket
+import os
 
 if __name__ == '__main__':
-    DataFileReader = csv.DictReader(open(r'pinglist.txt'),fieldnames=("address", "description"), delimiter=';')
+    DataFileReader = csv.DictReader(open(os.path.join(os.path.dirname(os.path.realpath(__file__)), r'pinglist.txt')),fieldnames=("address", "description"), delimiter=';')
     data = {}
     counter={1,2,3}
     for line in DataFileReader:
