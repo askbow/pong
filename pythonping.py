@@ -98,7 +98,7 @@ def checksum(source_string):
     countTo = (len(source_string)/2)*2
     count = 0
     while count<countTo:
-        thisVal = ord(source_string[count + 1])*256 + ord(source_string[count])
+        thisVal = source_string[count + 1]*256 + source_string[count]
         sum = sum + thisVal
         sum = sum & 0xffffffff # Necessary?
         count = count + 2
@@ -159,7 +159,7 @@ def send_one_ping(my_socket, dest_addr, ID):
     header = struct.pack("bbHHh", ICMP_ECHO_REQUEST, 0, my_checksum, ID, 1)
     bytesInDouble = struct.calcsize("d")
     data = (192 - bytesInDouble) * "Q"
-    data = struct.pack("d", time.time()) + data
+    data = struct.pack("d", time.time()) + data.encode()
  
     # Calculate the checksum on the data and the dummy header.
     my_checksum = checksum(header + data)
@@ -178,24 +178,23 @@ def do_one(dest_addr, timeout):
     Returns either the delay (in seconds) or none on timeout.
     """
     icmp = socket.getprotobyname("icmp")
+    delay = None
     try:
         my_socket = socket.socket(socket.AF_INET, socket.SOCK_RAW, icmp)
-    except socket.error, (errno, msg):
-        if errno == 1:
+        my_ID = os.getpid() & 0xFFFF
+        send_one_ping(my_socket, dest_addr, my_ID)
+        delay = receive_one_ping(my_socket, my_ID, timeout)
+    except socket.error as e:
+        if e.errno == 1:
             # Operation not permitted
-            msg = msg + (
+            msg = e.msg + (
                 " - Note that ICMP messages can only be sent from processes"
                 " running as root."
             )
             raise socket.error(msg)
         raise # raise the original error
- 
-    my_ID = os.getpid() & 0xFFFF
- 
-    send_one_ping(my_socket, dest_addr, my_ID)
-    delay = receive_one_ping(my_socket, my_ID, timeout)
- 
-    my_socket.close()
+    finally: 
+        my_socket.close()
     return delay
  
  
@@ -204,19 +203,19 @@ def verbose_ping(dest_addr, timeout = 2, count = 4):
     Send >count< ping to >dest_addr< with the given >timeout< and display
     the result.
     """
-    for i in xrange(count):
-        print "ping %s..." % dest_addr,
+    for i in range(count):
+        print("ping %s..." % dest_addr)
         try:
             delay  =  do_one(dest_addr, timeout)
-        except socket.gaierror, e:
-            print "failed. (socket error: '%s')" % e[1]
+        except socket.gaierror as e:
+            print("failed. (socket error: '%s')" % e.errno )
             break
  
         if delay  ==  None:
-            print "failed. (timeout within %ssec.)" % timeout
+            print("failed. (timeout within %ssec.)" % timeout )
         else:
             delay  =  delay * 1000
-            print "get ping in %0.4fms" % delay
+            print("get ping in %0.4fms" % delay )
     print
  
  
