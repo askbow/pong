@@ -11,13 +11,15 @@ except ImportError:
 
 
 """
-    A python PONG implementation based on python-verbose_ping("script by George Notaras.
+# pong.py
+# Tests Internet connectivity
+# 
+# MIT license
+# (c) Denis Borchev 
+    
     Refer to python-ping.py for comments and authorship: http://www.g-loaded.eu/2009/10/30/python-ping/
 
-    This file only calls python-ping functions in the same
-    manner and order other PONG scripts do in their particular languages.
-	
-	Now includes HTTP-ping capability 
+    Includes HTTP-ping capability 
     # AWS targets and HTTP ping idea credit http://www.cloudping.info/
 """
 from pythonping import * 
