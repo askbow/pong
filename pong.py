@@ -29,17 +29,19 @@ import sys
 import requests
 import string
 import random
+from math import inf
 
-def ___HTTPCall___(URI="", HTTP_TIMEOUT = 1):
-    #
-    if URI == "" : return None
+def ___HTTPCall___(URI="", HTTP_TIMEOUT = 3):
+    if URI=="" : return inf
     URI = URI +  "ping?x=" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
     if HTTP_TIMEOUT < 1: HTTP_TIMEOUT = 1
-    start = time.time()
+    #
+    roundtrip = inf
     try:
+        start = time.time()
         r = requests.get(URI, timeout=HTTP_TIMEOUT)
-    except: raise  
-    roundtrip = time.time() - start
+        roundtrip = time.time() - start
+    except: pass  
     return roundtrip
 
 def main():
