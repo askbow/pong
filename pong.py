@@ -32,63 +32,68 @@ import requests
 import string
 import random
 from math import inf
+from multiprocessing import Pool
 
-def ___HTTPCall___(URI="", HTTP_TIMEOUT = 3):
-    if URI=="" : return inf
+# As per http://comparch.gatech.edu/hparch/gupta_tr12.pdf
+# Plus my educated guess is, optimal performance is achieved (for most practical cases)
+# at around 8-16; consider how many cores / threads you have in your system as the upper limit on this
+SETTING_PROCESSES = 8
+SETTING_TIMEOUT = 2
+
+def ___HTTPCall___(URI=""):
+    #if URI=="" : return inf
     URI = URI +  "ping?x=" + ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(8))
-    if HTTP_TIMEOUT < 1: HTTP_TIMEOUT = 1
-    #
     roundtrip = inf
     try:
         start = time.time()
-        r = requests.get(URI, timeout=HTTP_TIMEOUT)
+        r = requests.get(URI, timeout=SETTING_TIMEOUT)
         roundtrip = time.time() - start
     except: pass  
     return roundtrip
 
-def main():
+def ___ICMPecho___(host=None):
+    roundtrip = inf
+    if host==None: return inf
+    try:
+        roundtrip = do_one(host, timeout=SETTING_TIMEOUT)#print socket.gethostbyname(line['address'])
+    except: pass  
+    return roundtrip
+    
+def __pong__(target=dict()):    
+    result = dict()
+    result['name'] = target['name']
+    roundtrip = inf
+    if target['type'] == 'http':      roundtrip = ___HTTPCall___(URI = target["endpoint"] )
+    if target['type'] == 'icmp-echo': roundtrip = ___ICMPecho___(target["endpoint"] )
+    result['roundtrip'] = roundtrip
+    return result
+    
+def load():
+    data = list()
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), r'pinglist.txt')) as f:
-        data = {}
-        counter={1,2,3}
         for line in csv.DictReader(f,fieldnames=("address", "description"), delimiter=';'):
-            data[line['address']]=0
-            
-            for i in counter:
-                try:
-                    a = do_one(line['address'], timeout=2)#print socket.gethostbyname(line['address'])
-                    if a: data[line['address']] +=a
-                except:
-                    pass
-            data[line['address']]=1000*(data[line['address']]/3)
-            print(line['description'], line['address'],"%0.4fms" % data[line['address']] )
+            d=dict()
+            d['type'] = 'icmp-echo'
+            d["endpoint"] = line["address"]
+            d["name"] = line["description"]
+            data.append(d)
+    #
     with open(os.path.join(os.path.dirname(os.path.realpath(__file__)), r'httppinglist.txt')) as f:
-        data = {}
-        counter = {1,2,3}
-        for line in csv.DictReader(f,fieldnames=("endpoint", "name"), delimiter=';'):
-            data[line['endpoint']] = 0
-            for i in counter:
-                try:
-                    a = ___HTTPCall___(line["endpoint"])
-                    if a: data[line['endpoint']] += a
-                except:
-                    pass
-            data[line['endpoint']]=1000*(data[line['endpoint']]/3)
-            print(line["name"],"%0.4fms" % data[line['endpoint']]  )
+        for line in csv.DictReader(f,fieldnames=("address", "description"), delimiter=';'):
+            d=dict()
+            d['type'] = 'http'
+            d["endpoint"] = line["address"]
+            d["name"] = line["description"]
+            data.append(d)
+    return data
         
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+def main():
+    a = list()
+    TARGETS = load()
+    with Pool(SETTING_PROCESSES) as p:
+	    a = p.map( __pong__ , TARGETS) 
+    for l in a:
+        print(l['name'],l['roundtrip'])
         
 if __name__ == '__main__':        
     main()
